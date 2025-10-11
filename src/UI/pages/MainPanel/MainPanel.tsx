@@ -3,7 +3,7 @@ export const MainPanel = () => {
   return (
     <main
       id="MainPanel"
-      className="flex-1 overflow-y-auto bg-background-secondary"
+      className="flex-1 overflow-y-auto bg-primary-foreground"
     >
       <PageContainer />
     </main>

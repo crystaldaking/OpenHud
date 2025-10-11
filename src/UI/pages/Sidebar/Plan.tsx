@@ -5,10 +5,10 @@ export const Plan = () => {
   return (
     <div
       id="Plan"
-      className="relative flex items-center justify-between rounded-lg bg-background-primary text-xs text-text"
+      className="relative flex items-center justify-between rounded-lg bg-background text-xs text-accent-foreground"
     >
       <button
-        className="relative flex size-full items-center justify-center rounded-l-lg bg-border px-3 py-2 transition-colors hover:bg-primary"
+        className="relative flex size-full items-center justify-center rounded-l-lg bg-border px-3 py-2 transition-colors hover:bg-primary-foreground"
         onClick={() =>
           window.electron.openExternalLink("https://www.patreon.com/JTMythic")
         }

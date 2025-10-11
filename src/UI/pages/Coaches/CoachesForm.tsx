@@ -143,7 +143,7 @@ export const CoachForm = ({ open, setOpen, prefill }: CoachFormProps) => {
           />
 
           <div>
-            <label htmlFor="team" className="mb-2 block font-medium text-text">
+            <label htmlFor="team" className="mb-2 block font-medium text-accent-foreground">
               Team
             </label>
             <select
@@ -151,14 +151,14 @@ export const CoachForm = ({ open, setOpen, prefill }: CoachFormProps) => {
               onChange={(e) => setTeam(e.target.value)}
               name="Team"
             >
-              <option value="" className="p-4 text-text">
+              <option value="" className="p-4 text-accent-foreground">
                 Team
               </option>
               {teams.map((team) => (
                 <option
                   key={team._id}
                   value={team._id}
-                  className="p-4 text-text"
+                  className="p-4 text-accent-foreground"
                 >
                   {team.name}
                 </option>

@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { maps } from "./MatchPage";
+import { TableCell, TableRow } from "@/components/ui/table";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface VetoRowProps {
   index: number;
@@ -24,7 +28,7 @@ export const VetoRow: React.FC<VetoRowProps> = ({
   const [leftTeam, setLeftTeam] = useState<Team | undefined>(undefined);
   const [rightTeam, setRightTeam] = useState<Team | undefined>(undefined);
   const [type, setType] = useState<"ban" | "pick" | "decider">(
-    veto?.type || "ban",
+    veto?.type || "pick",
   );
   const [mapName, setMapName] = useState<string | null>(veto?.mapName || null);
   const [side, setSide] = useState<"CT" | "T" | "NO">(veto.side);
@@ -47,113 +51,96 @@ export const VetoRow: React.FC<VetoRowProps> = ({
   };
 
   return (
-    <tr
-      key={index}
-      className="bg-background-secondary odd:bg-background-primary"
-    >
-      <td className="px-6 py-4">
+    <TableRow key={index}>
+      <TableCell>
         <h4 className="text-center font-semibold">Veto {index + 1}</h4>
-      </td>
-      <td className="px-6 py-4">
-        <form className="flex w-full flex-col">
-          <div className="flex w-full flex-col justify-center space-y-1">
-            {["ban", "pick", "decider"].map((option) => (
-              <label key={option} className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  value={option}
-                  checked={type === option}
-                  onChange={(e) => {
-                    const newType = e.target.value as
-                      | "ban"
-                      | "pick"
-                      | "decider";
-                    setType(newType);
-                    onVetoChange(index, "type", newType);
-                  }}
-                  name="Type"
-                  className="form-radio text-primary"
-                />
-                <span>{option.charAt(0).toUpperCase() + option.slice(1)}</span>
-              </label>
-            ))}
-          </div>
-        </form>
-      </td>
-      <td className="px-6 py-4">
-        <div className="w-full">
-          <select
-            disabled={type === "decider"}
-            value={type === "decider" ? "decider" : teamID || ""}
-            onChange={(e) => handleTeamSelect(e.target.value)}
-            name={type === "decider" ? "Decider" : "Team"}
-          >
-            <option value="" disabled>
-              Team
-            </option>
-            {type === "decider" && <option value="decider">Decider</option>}
+      </TableCell>
+      <TableCell>
+        <RadioGroup
+          value={type}
+          onValueChange={(newType: "pick" | "ban" | "decider") => {
+            setType(newType);
+            onVetoChange(index, "type", newType);
+          }}
+          className="flex flex-col space-y-1"
+        >
+          {["pick", "ban", "decider"].map((option) => (
+            <div key={option} className="flex items-center space-x-2">
+              <RadioGroupItem value={option} id={`${option}-${index}`} />
+              <label htmlFor={`${option}-${index}`} className="capitalize">{option}</label>
+            </div>
+          ))}
+        </RadioGroup>
+      </TableCell>
+      <TableCell>
+        <Select
+          disabled={type === "decider"}
+          value={type === "decider" ? "decider" : teamID || ""}
+          onValueChange={handleTeamSelect}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Team" />
+          </SelectTrigger>
+          <SelectContent>
+            {type === "decider" && <SelectItem value="decider">Decider</SelectItem>}
             {leftTeamId && leftTeam && (
-              <option value={leftTeamId}>{leftTeam.name}</option>
+              <SelectItem value={leftTeamId}>{leftTeam.name}</SelectItem>
             )}
             {rightTeamId && rightTeam && (
-              <option value={rightTeamId}>{rightTeam.name}</option>
+              <SelectItem value={rightTeamId}>{rightTeam.name}</SelectItem>
             )}
-          </select>
-        </div>
-      </td>
-      <td className="px-6 py-4">
-        <div className="w-full">
-          <select
-            value={mapName || ""}
-            onChange={(e) => {
-              const newMapName = e.target.value;
-              setMapName(newMapName);
-              onVetoChange(index, "mapName", newMapName);
-            }}
-            name="Map"
-          >
-            <option value="" disabled>
-              Map
-            </option>
+          </SelectContent>
+        </Select>
+      </TableCell>
+      <TableCell>
+        <Select
+          value={mapName || ""}
+          onValueChange={(newMapName) => {
+            setMapName(newMapName);
+            onVetoChange(index, "mapName", newMapName);
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Map" />
+          </SelectTrigger>
+          <SelectContent>
             {maps.map((map) => (
-              <option key={map} value={map}>
+              <SelectItem key={map} value={map}>
                 {map.charAt(3).toUpperCase() + map.slice(4)}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-        </div>
-      </td>
-      <td className="px-6 py-4">
-        <div className="w-full">
-          <select
-            value={side}
-            onChange={(e) => {
-              const newSide = e.target.value as "CT" | "T" | "NO";
-              setSide(newSide);
-              onVetoChange(index, "side", newSide);
-            }}
-            name="Side"
-          >
-            <option value="NO">No Side</option>
-            <option value="CT">CT</option>
-            <option value="T">T</option>
-          </select>
-        </div>
-      </td>
-      <td className="px-6 py-4">
-        <div className="col-span-2 flex w-full flex-col items-center justify-center">
-          <input
-            type="checkbox"
-            id={`reverseSide-${index}`}
-            checked={reverseSide === true}
-            onChange={(e) => {
-              const newReverseSide = e.target.checked;
-              setReverseSide(newReverseSide);
-              onVetoChange(index, "reverseSide", newReverseSide);
-            }}
-          />
-        </div>
-      </td>
-    </tr>
+          </SelectContent>
+        </Select>
+      </TableCell>
+      <TableCell>
+        <Select
+          value={side}
+          onValueChange={(newSide: "CT" | "T" | "NO") => {
+            setSide(newSide);
+            onVetoChange(index, "side", newSide);
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Side" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="NO">No Side</SelectItem>
+            <SelectItem value="CT">CT</SelectItem>
+            <SelectItem value="T">T</SelectItem>
+          </SelectContent>
+        </Select>
+      </TableCell>
+      <TableCell className="text-center">
+        <Checkbox
+          id={`reverseSide-${index}`}
+          checked={reverseSide === true}
+          onCheckedChange={(checked) => {
+            const newReverseSide = checked === true;
+            setReverseSide(newReverseSide);
+            onVetoChange(index, "reverseSide", newReverseSide);
+          }}
+        />
+      </TableCell>
+    </TableRow>
   );
 };

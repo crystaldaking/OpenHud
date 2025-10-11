@@ -18,11 +18,11 @@ export const AppFrame = () => {
   return (
     <div
       id="AppFrame"
-      className="relative flex h-7 w-full items-center gap-10 bg-background-contrast pl-4 text-text"
+      className="relative flex h-7 w-full items-center gap-10 bg-black pl-4 text-accent-foreground z-[1000] noDrag select-none"
     >
       <div className="flex items-center gap-4">
         <button
-          className="noDrag text-text-secondary transition-colors hover:text-secondary-light"
+          className="noDrag text-accent-foreground-secondary transition-colors hover:text-secondary-light"
           onClick={() => window.electron.sendFrameAction("CONSOLE")}
         >
           <VscDebugConsole className="size-5" />
@@ -33,7 +33,7 @@ export const AppFrame = () => {
               "https://github.com/JohnTimmermann/OpenHud",
             )
           }
-          className="noDrag text-text-secondary transition-colors hover:text-secondary-light"
+          className="noDrag text-accent-foreground-secondary transition-colors hover:text-secondary-light"
           rel="noreferrer"
         >
           <FaGithub className="size-5" />
@@ -42,7 +42,7 @@ export const AppFrame = () => {
           onClick={() =>
             window.electron.openExternalLink("https://discord.gg/HApB9HyaWM")
           }
-          className="noDrag text-text-secondary transition-colors hover:text-secondary-light"
+          className="noDrag text-accent-foreground-secondary transition-colors hover:text-secondary-light"
           rel="noreferrer"
         >
           <svg

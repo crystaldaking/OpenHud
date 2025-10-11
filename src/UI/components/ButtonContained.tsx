@@ -15,7 +15,7 @@ export const ButtonContained = ({
     <button
       {...rest}
       className={twMerge(
-        "noDrag flex items-center justify-center rounded-full bg-primary px-5 py-1.5 text-sm font-semibold uppercase text-button-text drop-shadow-md transition-colors hover:bg-primary-dark",
+        "noDrag flex items-center justify-center rounded-full bg-primary-foreground px-5 py-1.5 text-sm font-semibold uppercase text-button-text drop-shadow-md transition-colors hover:bg-primary-foreground-dark",
         className,
       )}
     >

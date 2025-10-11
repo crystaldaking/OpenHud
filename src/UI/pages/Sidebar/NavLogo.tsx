@@ -9,7 +9,7 @@ export const NavLogo = () => {
         className="relative flex h-16 w-full items-center justify-center rounded-lg p-2"
       >
         <span className="noDrag text-5xl font-bold text-primary-light">O</span>
-        <span className="noDrag text-5xl font-bold text-text">H</span>
+        <span className="noDrag text-5xl font-bold text-accent-foreground">H</span>
       </NavLink>
     </div>
   );

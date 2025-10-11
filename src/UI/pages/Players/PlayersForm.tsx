@@ -1,13 +1,24 @@
 import { useEffect, useState } from "react";
-import {
-  ButtonContained,
-  Container,
-  TextInput,
-  Dialog,
-} from "../../components";
 import { countries } from "../../api/countries";
 import { usePlayers, useTeams } from "../../hooks";
 import { apiUrl } from "../../api/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldError,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PlayerSilhouette } from "./PlayersPage";
 
 interface PlayerFormProps {
   open: boolean;
@@ -161,136 +172,131 @@ export const PlayerForm = ({ open, setOpen, prefill }: PlayerFormProps) => {
   };
 
   return (
-    <Dialog onClose={handleCancel} open={open}>
-      <h1>{isEditing && "Editing"}</h1>
-      <div className="flex flex-1 border-b border-border">
-        <h3 className="px-6 py-4 font-semibold">
-          {isEditing ? `Updating: ${username}` : "Create Player"}
-        </h3>
-      </div>
-      <Container>
-        <div className="grid w-full flex-1 grid-cols-2 gap-4 overflow-y-scroll p-6">
-          <TextInput
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            error={!!usernameError} // Set error state based on usernameError
-            errorMessage={usernameError} // Show error message below field
-          />
-          <TextInput
-            label="SteamID64"
-            value={steamId}
-            onChange={(e) => setSteamId(e.target.value)}
-            required
-            error={!!steamIdError || !!steamIdFormatError} // Set error state based on steamIdError or steamIdFormatError
-            errorMessage={steamIdError || steamIdFormatError} // Show error message below field
-          />
-          <TextInput
-            label="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <TextInput
-            label="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-          <div>
-            <label htmlFor="team" className="mb-2 block font-medium text-text">
-              Team
-            </label>
-            <select
-              value={team}
-              onChange={(e) => setTeam(e.target.value)}
-              name="Team"
-            >
-              <option value="" className="p-4 text-text">
-                Team
-              </option>
-              {teams.map((team) => (
-                <option
-                  key={team._id}
-                  value={team._id}
-                  className="p-4 text-text"
-                >
-                  {team.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="mb-2 block font-medium">Country</label>
-            <select
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            >
-              <option value="">Country</option>
-              {Object.entries(countries).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value as string}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="avatar"
-              className="mb-2 block font-medium text-text"
-            >
-              Avatar
-            </label>
-            <div className="flex flex-col items-start gap-4">
-              {/* Show current avatar if editing and player has one */}
-              {isEditing && selectedPlayer?.avatar && (
-                <img
-                  src={apiUrl + "/players/avatar/" + selectedPlayer._id}
-                  alt="Current Avatar"
-                  className="size-36 rounded-sm border object-cover"
-                />
-              )}
-
-              {/* Hidden file input */}
-              <input
-                type="file"
-                id="avatar"
-                accept="image/*"
-                onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-                className="hidden"
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleCancel()}>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>{isEditing ? `Updating: ${username}` : "Create Player"}</DialogTitle>
+        </DialogHeader>
+        <FieldGroup>
+          <div className="grid grid-cols-2 gap-4">
+            <Field>
+              <FieldLabel htmlFor="username">Username</FieldLabel>
+              <Input
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                aria-invalid={!!usernameError}
               />
-
-              {/* Custom button to trigger file input */}
-              <button
-                type="button"
-                onClick={() => document.getElementById("avatar")?.click()}
-                className="rounded bg-primary px-4 py-2 text-white transition-colors hover:bg-primary-dark"
-              >
-                Upload Avatar
-              </button>
-
-              {/* Display the selected file name */}
-              {avatarFile && (
-                <span className="text-sm text-gray-500">{avatarFile.name}</span>
+              {usernameError && <FieldError>{usernameError}</FieldError>}
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="steamId">SteamID64</FieldLabel>
+              <Input
+                id="steamId"
+                value={steamId}
+                onChange={(e) => setSteamId(e.target.value)}
+                required
+                aria-invalid={!!steamIdError || !!steamIdFormatError}
+              />
+              {(steamIdError || steamIdFormatError) && (
+                <FieldError>{steamIdError || steamIdFormatError}</FieldError>
               )}
-            </div>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="firstName">First Name</FieldLabel>
+              <Input
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
+              <Input
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Team</FieldLabel>
+              <Select value={team} onValueChange={setTeam}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Team" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map((team) => (
+                    <SelectItem key={team._id} value={team._id}>
+                      {team.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field>
+              <FieldLabel>Country</FieldLabel>
+              <Select value={country} onValueChange={setCountry}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(countries).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value as string}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field>
+              <FieldLabel>Avatar</FieldLabel>
+              <div className="flex flex-col items-start gap-4">
+                {isEditing && selectedPlayer?.avatar && (
+                  <img
+                    src={`${apiUrl}/players/avatar/${selectedPlayer._id}?t=${new Date().getTime()}`}
+                    alt="Current Avatar"
+                    className="size-36 rounded-sm border object-cover"
+                  />
+                )}
+                {!selectedPlayer?.avatar && isEditing && (
+                  <img src={PlayerSilhouette} alt="Player Silhouette" className="size-36" />
+                )}
+                <input
+                  type="file"
+                  id="avatar"
+                  accept="image/*"
+                  onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => document.getElementById("avatar")?.click()}
+                >
+                  Upload Avatar
+                </Button>
+                {avatarFile && (
+                  <span className="text-sm text-muted-foreground">{avatarFile.name}</span>
+                )}
+              </div>
+            </Field>
           </div>
-        </div>
-      </Container>
-      <div className="inline-flex w-full justify-end gap-2 border-t border-border p-2">
-        <div className="mt-1 flex justify-end gap-1">
+        </FieldGroup>
+        <DialogFooter>
           {isSubmitting ? (
-            <ButtonContained disabled>Submitting...</ButtonContained>
+            <Button disabled>Submitting...</Button>
           ) : (
-            <ButtonContained onClick={handleSubmit}>Submit</ButtonContained>
+            <Button onClick={handleSubmit}>Submit</Button>
           )}
-          <ButtonContained onClick={handleReset}>Reset</ButtonContained>
+          <Button variant="outline" onClick={handleReset}>Reset</Button>
           {isEditing && (
-            <ButtonContained color="secondary" onClick={handleCancel}>
+            <Button variant="secondary" onClick={handleCancel}>
               Cancel
-            </ButtonContained>
+            </Button>
           )}
-        </div>
-      </div>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

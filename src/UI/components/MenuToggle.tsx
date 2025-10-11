@@ -1,8 +1,11 @@
 import { MdMenu } from "react-icons/md";
-import { useDrawer } from "../hooks";
 
 export const MenuToggle = () => {
-  const { toggleDrawer } = useDrawer();
+  const toggleDrawer = () => {
+    console.log("Toggling drawer");
+    // useDrawer().toggle();
+  };
+
   return (
     <div className="flex w-full items-center pl-2.5">
       <button

@@ -1,13 +1,29 @@
 import { useEffect, useState } from "react";
-import {
-  ButtonContained,
-  Container,
-  TextInput,
-  Dialog,
-} from "../../components";
 import { countries } from "../../api/countries";
 import { useTeams } from "./useTeams";
 import { apiUrl } from "../../api/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldError,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 interface TeamsFormProps {
   open: boolean;
@@ -101,88 +117,91 @@ export const TeamsForm = ({ open, setOpen }: TeamsFormProps) => {
   };
 
   return (
-    <Dialog onClose={handleCancel} open={open}>
-      <div className="flex flex-1 border-b border-border">
-        <h3 className="px-6 py-4 font-semibold">
-          {isEditing ? `Updating: ${teamName}` : "Create Team"}
-        </h3>
-      </div>
-      <Container>
-        <div className="my-2 flex w-full flex-col gap-3">
-          <TextInput
-            label={"Team Name"}
-            value={teamName}
-            required
-            onChange={(e) => setTeamName(e.target.value)}
-            error={!!teamNameError} // Set error state based on teamNameError
-            errorMessage={teamNameError} // Show error message below field
-          />
-          <TextInput
-            label="Short Name"
-            value={shortName}
-            onChange={(e) => setShortName(e.target.value)}
-          />
-          <form className="mb-4">
-            <label className="mb-2 block font-medium text-text">Country</label>
-            <select
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            >
-              <option value="">Country</option>
-              {Object.entries(countries).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value as string}
-                </option>
-              ))}
-            </select>
-          </form>
-          <div className="flex flex-col items-center gap-4">
-            {/* Show current avatar if editing and player has one */}
-            {isEditing && selectedTeam?.logo && (
-              <img
-                src={apiUrl + "/teams/logo/" + selectedTeam._id}
-                alt="Current Logo"
-                className="size-36 rounded-sm border object-cover"
-              />
-            )}
-            <input
-              type="file"
-              id="logo"
-              accept="image/*"
-              onChange={(e) => setLogo(e.target.files?.[0] || null)}
-              className="hidden"
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleCancel()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{isEditing ? `Updating: ${teamName}` : "Create Team"}</DialogTitle>
+        </DialogHeader>
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor="teamName">Team Name</FieldLabel>
+            <Input
+              id="teamName"
+              value={teamName}
+              required
+              onChange={(e) => setTeamName(e.target.value)}
+              aria-invalid={!!teamNameError}
             />
-            <button
-              type="button"
-              onClick={() => document.getElementById("logo")?.click()}
-              className="rounded bg-primary px-4 py-2 text-white transition-colors hover:bg-primary-dark"
-            >
-              Upload Logo
-            </button>
-            {logo && (
-              <span className="text-sm text-text-secondary">{logo.name}</span>
-            )}
-            {logoError && (
-              <p className="pt-2 text-sm text-red-500">{logoError}</p>
-            )}
-          </div>
-        </div>
-      </Container>
-      <div className="flex w-full justify-end gap-2 border-t border-border p-2">
-        <div className="mt-1 flex justify-end gap-1">
-          {isSubmitting ? (
-            <ButtonContained disabled>Submitting...</ButtonContained>
-          ) : (
-            <ButtonContained onClick={handleSubmit}>Submit</ButtonContained>
-          )}
-          <ButtonContained onClick={handleReset}>Reset</ButtonContained>
-          {isEditing && (
-            <ButtonContained color="secondary" onClick={handleCancel}>
-              Cancel
-            </ButtonContained>
-          )}
-        </div>
-      </div>
+            {teamNameError && <FieldError>{teamNameError}</FieldError>}
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="shortName">Short Name</FieldLabel>
+            <Input
+              id="shortName"
+              value={shortName}
+              onChange={(e) => setShortName(e.target.value)}
+            />
+          </Field>
+          <Field>
+            <FieldLabel>Country</FieldLabel>
+            <Select value={country} onValueChange={setCountry}>
+              <SelectTrigger>
+                <SelectValue placeholder="Country" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(countries).map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value as string}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field>
+            <FieldLabel>Logo</FieldLabel>
+            <div className="flex flex-col items-start gap-4">
+              {isEditing && selectedTeam?.logo && (
+                <img
+                  src={`${apiUrl}/teams/logo/${selectedTeam._id}?t=${new Date().getTime()}`}
+                  alt="Current Logo"
+                  className="size-36 rounded-sm border object-cover"
+                />
+              )}
+              <input
+                type="file"
+                id="logo"
+                accept="image/*"
+                onChange={(e) => setLogo(e.target.files?.[0] || null)}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => document.getElementById("logo")?.click()}
+              >
+                Upload Logo
+              </Button>
+              {logo && (
+                <span className="text-sm text-muted-foreground">{logo.name}</span>
+              )}
+              {logoError && <FieldError>{logoError}</FieldError>}
+            </div>
+          </Field>
+        </FieldGroup>
+        <DialogFooter>
+        {isSubmitting ? (
+          <Button disabled>Submitting...</Button>
+        ) : (
+          <Button onClick={handleSubmit}>Submit</Button>
+        )}
+        <Button variant="outline" onClick={handleReset}>Reset</Button>
+        {isEditing && (
+          <Button variant="secondary" onClick={handleCancel}>
+            Cancel
+          </Button>
+        )}
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

@@ -50,14 +50,14 @@ export const Settings = ({ onClose }: SettingsProps) => {
     <div className="flex flex-col gap-6 overflow-y-auto">
       <h2 className="border-b border-border pb-2 font-bold">Settings</h2>
       <div className="container flex flex-col gap-6 overflow-y-auto">
-        <div className="rounded-lg bg-background-secondary p-6 shadow-md">
+        <div className="rounded-lg bg-primary-foreground p-6 shadow-md">
           <h2 className="mb-4 text-xl font-semibold">HUDs Directory</h2>
           <ButtonContained onClick={() => window.electron.openHudsDirectory()}>
             Open Directory
           </ButtonContained>
         </div>
 
-        <div className="rounded-lg bg-background-secondary p-6 shadow-md">
+        <div className="rounded-lg bg-primary-foreground p-6 shadow-md">
           <h2 className="mb-4 text-xl font-semibold">
             Select Language (Coming Soon)
           </h2>
@@ -75,11 +75,11 @@ export const Settings = ({ onClose }: SettingsProps) => {
           </select>
         </div>
 
-        <div className="rounded-lg bg-background-secondary p-6 shadow-md">
+        <div className="rounded-lg bg-primary-foreground p-6 shadow-md">
           <h2 className="mb-4 text-xl font-semibold">
             Auto-switch Sides (Coming Soon)
           </h2>
-          <div className="flex items-center text-text-disabled">
+          <div className="flex items-center text-accent-foreground-disabled">
             <label className="switch">
               <input
                 type="checkbox"
@@ -94,17 +94,17 @@ export const Settings = ({ onClose }: SettingsProps) => {
           </div>
         </div>
 
-        <div className="rounded-lg bg-background-secondary p-6 shadow-md">
+        <div className="rounded-lg bg-primary-foreground p-6 shadow-md">
           <h2 className="mb-4 text-xl font-semibold">
             File Status (Not yet working)
           </h2>
-          <p className="text-text-secondary">
+          <p className="text-accent-foreground-secondary">
             Check if the required files are installed:
           </p>
           <ul className="mt-2 list-inside list-disc"></ul>
           <button
             disabled
-            className="mt-4 rounded-lg bg-gray-700 px-4 py-2 text-text-disabled"
+            className="mt-4 rounded-lg bg-gray-700 px-4 py-2 text-accent-foreground-disabled"
           >
             Install Files
           </button>

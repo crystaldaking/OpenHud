@@ -21,7 +21,7 @@ export const TextInput = ({
 }: TextInputProps) => {
   return (
     <div className="mb-4">
-      <label htmlFor={label} className="mb-2 block font-medium text-text">
+      <label htmlFor={label} className="mb-2 block font-medium text-accent-foreground">
         {label}
       </label>
       <input

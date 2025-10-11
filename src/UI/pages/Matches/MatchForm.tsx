@@ -1,9 +1,27 @@
 import { useEffect, useState } from "react";
 import { MatchTypes } from "./MatchPage";
 import { VetoRow } from "./VetoRow";
-import { ButtonContained, Container, Dialog } from "../../components";
 import { useMatches } from "./useMatches";
 import { useTeams } from "../../hooks";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 interface MatchFormProps {
   open: boolean;
@@ -141,163 +159,137 @@ export const MatchForm = ({ open, setOpen }: MatchFormProps) => {
   const vetoSource = selectedMatch?.vetos || vetos;
 
   return (
-    <Dialog onClose={handleCancel} open={open}>
-      <div className="flex flex-1 border-b border-border">
-        <h3 className="px-6 py-4 font-semibold">
-          {isEditing
-            ? `Updating: ${leftTeam?.name} vs ${rightTeam?.name}`
-            : "Create Match"}
-        </h3>
-      </div>
-      <Container>
-        <div className="flex flex-1 flex-col overflow-y-scroll p-6">
-          <div className="my-2 flex items-center justify-center gap-4">
-            <div className="bg-background-primary">
-              <select
-                value={leftTeamId || ""}
-                onChange={(e) => setLeftTeamId(e.target.value)}
-                name="Team One"
-              >
-                <option>Team One</option>
-                {teams.map((team) => (
-                  <option
-                    key={team._id}
-                    value={team._id}
-                    className="p-4 text-text"
-                  >
-                    {team.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <h2 className="font-semibold">VS</h2>
-
-            <div className="bg-background-primary">
-              <select
-                value={rightTeamId || ""}
-                onChange={(e) => setRightTeamId(e.target.value)}
-                name="Team Two"
-              >
-                <option>Team Two</option>
-                {teams.map((team) => (
-                  <option
-                    key={team._id}
-                    value={team._id}
-                    className="p-4 text-text"
-                  >
-                    {team.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleCancel()}>
+      <DialogContent className="max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>
+            {isEditing ? `Updating: ${leftTeam?.name} vs ${rightTeam?.name}` : "Create Match"}
+          </DialogTitle>
+        </DialogHeader>
+        <FieldGroup>
+          <div className="grid grid-cols-3 items-center justify-center gap-4">
+            <Field>
+              <FieldLabel>Team One</FieldLabel>
+              <Select value={leftTeamId || ""} onValueChange={setLeftTeamId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Team One" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map((team) => (
+                    <SelectItem key={team._id} value={team._id}>
+                      {team.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <div className="text-center font-semibold">VS</div>
+            <Field>
+              <FieldLabel>Team Two</FieldLabel>
+              <Select value={rightTeamId || ""} onValueChange={setRightTeamId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Team Two" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map((team) => (
+                    <SelectItem key={team._id} value={team._id}>
+                      {team.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
           </div>
 
-          <div className="my-2 flex items-center justify-center gap-4">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Left Wins</label>
-              <input
+          <div className="grid grid-cols-3 items-end justify-center gap-4">
+            <Field>
+              <FieldLabel>Left Wins</FieldLabel>
+              <Input
                 type="number"
                 min={0}
-                className="h-8 w-20 rounded-sm border border-gray-300 px-2"
                 value={leftTeamWins}
                 onChange={(e) => setLeftTeamWins(Number(e.target.value || 0))}
               />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Right Wins</label>
-              <input
+            </Field>
+            <Field>
+              <FieldLabel>Best Of</FieldLabel>
+              <Select
+                value={matchType}
+                onValueChange={(value) =>
+                  setMatchType(value as "bo1" | "bo2" | "bo3" | "bo5")
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Match Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MatchTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type.toUpperCase()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field>
+              <FieldLabel>Right Wins</FieldLabel>
+              <Input
                 type="number"
                 min={0}
-                className="h-8 w-20 rounded-sm border border-gray-300 px-2"
                 value={rightTeamWins}
                 onChange={(e) => setRightTeamWins(Number(e.target.value || 0))}
               />
-            </div>
+            </Field>
           </div>
-
-          <div className="flex items-center justify-center">
-            <form className="flex flex-col items-center justify-center bg-background-primary">
-              <label
-                htmlFor="Match Type"
-                className="text-sm font-semibold uppercase text-gray-400"
-              >
-                Best of
-              </label>
-              <select
-                value={matchType}
-                onChange={(e) =>
-                  setMatchType(e.target.value as "bo1" | "bo2" | "bo3" | "bo5")
-                }
-                name="Match Type"
-              >
-                {MatchTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
+            <ScrollArea className="h-96 rounded-md border p-4">
+            <Field className="mt-4">
+              <FieldLabel>Vetos</FieldLabel>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Veto</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Team</TableHead>
+                    <TableHead>Map</TableHead>
+                    <TableHead>Side</TableHead>
+                    <TableHead className="text-center">Reverse</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                {vetoSource.map((veto, index) => (
+                  <VetoRow
+                    key={index}
+                    index={index}
+                    veto={veto}
+                    leftTeamId={leftTeamId}
+                    rightTeamId={rightTeamId}
+                    teams={teams}
+                    onVetoChange={handleVetoChange}
+                  />
                 ))}
-              </select>
-            </form>
-          </div>
-
-          <h5 className="mt-4 font-semibold">Set Vetos:</h5>
-          {/* <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3"> */}
-          <table className="min-w-full divide-y divide-slate-400">
-            <thead className="bg-background-secondary">
-              <tr>
-                <TableTH title="veto" />
-                <TableTH title="type" />
-                <TableTH title="Team" />
-                <TableTH title="Map" />
-                <TableTH title="Side" />
-                <TableTH title="Reverse side" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-700 p-4">
-              {vetoSource.map((veto, index) => (
-                <VetoRow
-                  key={index}
-                  index={index}
-                  veto={veto}
-                  leftTeamId={leftTeamId}
-                  rightTeamId={rightTeamId}
-                  teams={teams}
-                  onVetoChange={handleVetoChange}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Container>
-      <div className="inline-flex w-full justify-end gap-2 border-t border-border p-2">
+                </TableBody>
+              </Table>
+            </Field>
+          <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </FieldGroup>
+        <DialogFooter>
         {errorMessage && (
-          <p className="my-1 text-end text-red-500">{errorMessage}</p>
+          <FieldError className="mr-auto">{errorMessage}</FieldError>
         )}
-        <div className="mt-1 flex justify-end gap-1">
           {isSubmitting ? (
-            <ButtonContained disabled>Submitting...</ButtonContained>
+            <Button disabled>Submitting...</Button>
           ) : (
-            <ButtonContained onClick={handleSubmit}>Submit</ButtonContained>
+            <Button onClick={handleSubmit}>Submit</Button>
           )}
-          <ButtonContained onClick={handleReset}>Reset</ButtonContained>
+          <Button variant="outline" onClick={handleReset}>Reset</Button>
           {isEditing && (
-            <ButtonContained color="secondary" onClick={handleCancel}>
+            <Button variant="secondary" onClick={handleCancel}>
               Cancel
-            </ButtonContained>
+            </Button>
           )}
-        </div>
-      </div>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
-  );
-};
-
-interface TableTHProps {
-  title: string;
-}
-
-const TableTH: React.FC<TableTHProps> = ({ title }) => {
-  return (
-    <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-400">
-      {title}
-    </th>
   );
 };
