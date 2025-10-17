@@ -6,6 +6,9 @@ import { TeamsPage } from "./pages/Teams/TeamsPage";
 import { AppProviders } from "./context/AppProviders";
 import { Layout } from "./pages/Layout";
 import { CoachesPage } from "./pages/Coaches/CoachesPage";
+import { HudPage } from "./pages/Hud/HudPage";
+import { OverlayPage } from "./pages/Overlay";
+import { Settings } from "./pages/Settings";
 
 const AuthenticatedRoutes = () => (
   <AppProviders>
@@ -17,7 +20,10 @@ const AuthenticatedRoutes = () => (
           <Route path="players" element={<PlayersPage />} />
           <Route path="teams" element={<TeamsPage />} />
           <Route path="coaches" element={<CoachesPage />} />
+          <Route path="hud" element={<HudPage />} />
+          <Route path="overlay" element={<OverlayPage />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </MemoryRouter>

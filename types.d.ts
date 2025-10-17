@@ -2,9 +2,23 @@ interface Window {
   electron: {
     startServer: (callback: (message: string) => void) => void;
     sendFrameAction: (payload: FrameWindowAction) => void;
-    startOverlay: () => void;
+    startOverlay: (config?: Partial<OverlayConfig>) => void;
+    stopOverlay: () => void;
+    onOverlayStatus: (
+      callback: (status: OverlayStatus) => void,
+    ) => () => void;
+    getOverlayStatus: () => Promise<OverlayStatus>;
+    setOverlayConfig: (config: Partial<OverlayConfig>) => void;
     openExternalLink: (url: string) => void;
     openHudsDirectory: () => void;
+    openHudAssetsDirectory: () => void;
+    setAppZoom: (zoomFactor: number) => void;
+    importLegacyData: () => Promise<LegacyImportResult>;
+    fixGSI: () => Promise<GSIResult>;
+    selectImportSource: () => Promise<ImportPreviewResult>;
+    importData: (payload: ImportDataPayload) => Promise<ImportDataResult>;
+    exportData: (selection: DataExportSelection) => Promise<ExportDataResult>;
+    openExportsDirectory: () => void;
   };
   update: {
     updateMessage: (callback: (message: string) => void) => void;
@@ -22,12 +36,131 @@ interface Window {
 
 type EventPayloadMapping = {
   startServer: string;
-  startOverlay;
+  startOverlay: null;
+  "overlay:start": Partial<OverlayConfig>;
+  "overlay:stop": void;
+  "overlay:setConfig": Partial<OverlayConfig>;
+  "overlay:status": OverlayStatus;
+  "overlay:getStatus": OverlayStatus;
+  "overlay:getDisplays": OverlayDisplay[];
   sendFrameAction: FrameWindowAction;
   openExternalLink: string;
   getPlayers: Promise<Player[]>;
   updateMessage: string;
   openHudsDirectory: void;
+  openHudAssetsDirectory: void;
+  "exports:open": void;
+  "app:setZoom": number;
+  "legacy:import": LegacyImportResult;
+  "gsi:fix": GSIResult;
+  "data:selectImportSource": ImportPreviewResult;
+  "data:import": ImportDataResult;
+  "data:export": ExportDataResult;
+};
+
+type LegacyImportResult = {
+  success: boolean;
+  message: string;
+  players: number;
+  teams: number;
+  coaches: number;
+  matches: number;
+  logs: string[];
+};
+
+type GSIResult = {
+  success: boolean;
+  message: string;
+  targetPath?: string;
+};
+
+type DataSelection = {
+  includeAll: boolean;
+  ids: string[];
+};
+
+type DataTransferCounts = Record<
+  "teams" | "players" | "coaches" | "matches",
+  number
+>;
+
+type DataExportSelection = {
+  players: DataSelection;
+  teams: DataSelection;
+  coaches: DataSelection;
+  matches: DataSelection;
+};
+
+type ImportDataResult = {
+  success: boolean;
+  message: string;
+  counts?: DataTransferCounts;
+  cancelled?: boolean;
+  autoIncludedTeams?: string[];
+};
+
+type ExportDataResult = {
+  success: boolean;
+  message: string;
+  counts?: DataTransferCounts;
+  filePath?: string;
+  autoIncludedTeams?: string[];
+  cancelled?: boolean;
+};
+
+type DatabaseTeamRow = {
+  _id: string;
+  name?: string;
+  shortName?: string | null;
+  country?: string | null;
+  logo?: string | null;
+  [key: string]: unknown;
+};
+
+type DatabasePlayerRow = {
+  _id: string;
+  username?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  team?: string | null;
+  steamid?: string;
+  avatar?: string | null;
+  [key: string]: unknown;
+};
+
+type DatabaseCoachRow = {
+  steamid: string;
+  name?: string | null;
+  team?: string | null;
+  [key: string]: unknown;
+};
+
+type DatabaseMatchRow = {
+  id: string;
+  left_id?: string | null;
+  right_id?: string | null;
+  matchType?: string | null;
+  current?: number | boolean;
+  [key: string]: unknown;
+};
+
+type DatabaseSnapshot = {
+  teams: DatabaseTeamRow[];
+  players: DatabasePlayerRow[];
+  coaches: DatabaseCoachRow[];
+  matches: DatabaseMatchRow[];
+};
+
+type ImportPreviewResult = {
+  cancelled: boolean;
+  filePath?: string;
+  snapshot?: DatabaseSnapshot;
+  error?: string;
+};
+
+type ImportDataPayload = {
+  sourcePath: string;
+  selection: DataExportSelection;
 };
 
 type FrameWindowAction =
@@ -142,11 +275,27 @@ interface Match {
     id: string | null;
     wins: number;
   };
-  matchType: "bo1" | "bo2" | "bo3" | "bo5";
+  matchType: "bo1" | "bo3" | "bo5";
   vetos: Veto[];
 }
 
 type MapConfig = SingleLayer | DoubleLayer;
+
+type OverlayDisplay = {
+  id: number;
+  label: string;
+};
+
+interface OverlayConfig {
+  displayId: number | null;
+  scale: number;
+}
+
+interface OverlayStatus {
+  isVisible: boolean;
+  config: OverlayConfig;
+  displays: OverlayDisplay[];
+}
 
 type Weapon =
   | "ak47"

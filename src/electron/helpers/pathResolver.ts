@@ -1,6 +1,5 @@
 import path from "path";
 import { app } from "electron";
-import fs from "fs";
 import { isDev } from "./util.js";
 
 /* Determine preload path based on if we are in dev */
@@ -40,21 +39,6 @@ export function getDefaultHUDPath() {
   );
 }
 
-/* If a user has a custom HUD, use that path, otherwise use the default path */
-export function getHudPath() {
-  // Determine at runtime whether a custom HUD build exists under the user's home
-  const customIndex = path.join(
-    app.getPath("home"),
-    "OpenHud-Huds",
-    "build",
-    "index.html",
-  );
-  if (fs.existsSync(customIndex)) {
-    return getCustomHudPath();
-  }
-  return getDefaultHUDPath();
-}
-
 // Path for uploads folder
 export function getUploadsPath() {
   return path.join(app.getPath("userData"), "uploads");
@@ -68,4 +52,15 @@ export function getPlayerPicturesPath() {
 // Path for team logos (in uploads folder)
 export function getTeamLogosPath() {
   return path.join(getUploadsPath(), "team_logos");
+}
+
+export function getProgramRootPath() {
+  if (isDev()) {
+    return app.getAppPath();
+  }
+  return path.dirname(process.execPath);
+}
+
+export function getExportsPath() {
+  return path.join(getProgramRootPath(), "exports");
 }

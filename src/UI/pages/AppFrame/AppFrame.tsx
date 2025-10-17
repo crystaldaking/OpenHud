@@ -57,9 +57,14 @@ export const AppFrame = () => {
           </svg>
         </button>
       </div>
-      <div className="absolute left-1/2 flex font-semibold">
-        <p>Open</p>
-        <p className="text-primary-light">Hud</p>
+      <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2 font-semibold text-center">
+        <div className="flex items-center gap-1">
+          <p>Open</p>
+          <p className="text-primary-light">Hud</p>
+        </div>
+        <span className="text-xs font-normal uppercase tracking-wide text-text-secondary">
+          modded by @djestick
+        </span>
       </div>
       <div className="absolute right-0 inline-flex h-full w-min justify-end">
         <button
