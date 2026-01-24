@@ -19,7 +19,7 @@ export function getDatabasePath() {
 
 // Needed for verifying URL
 export function getUIPath() {
-  return path.join(app.getAppPath() + "/dist-react/index.html");
+  return path.join(app.getAppPath() + "/dist-ui/index.html");
 }
 
 // Path for Assets (images, icons, ect)

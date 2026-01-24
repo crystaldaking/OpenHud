@@ -1,7 +1,7 @@
 {
   "appId": "com.openhud.electron-app",
   "productName": "OpenHud",
-  "files": ["dist-electron", "dist-react"],
+  "files": ["dist-electron", "dist-ui"],
   "extraResources": ["dist-electron/preload.cjs", "src/assets/**"],
   "icon": "./desktopIcon.png",
   "publish": {
